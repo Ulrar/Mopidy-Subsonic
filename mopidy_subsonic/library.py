@@ -9,9 +9,9 @@
 # Author: Kevin Lemonnier
 #           By: Kevin Lemonnier
 # Created: Wed Apr 17 19:54:44 2013 (+0200)
-# Last-Updated: Sat Apr 20 17:55:18 2013 (+0200)
+# Last-Updated: Sat Apr 20 22:03:24 2013 (+0200)
 # Version:
-#     Update #: 24
+#     Update #: 41
 
 # Change Log:
 #
@@ -26,7 +26,7 @@ import logging
 import libsonic
 
 from mopidy.backends import base
-from mopidy.models import Track, SearchResult
+from mopidy.models import Track, SearchResult, Artist
 
 logger = logging.getLogger('mopidy.backends.subsonic')
 
@@ -41,19 +41,20 @@ class SubsonicLibraryProvider(base.BaseLibraryProvider):
         return []
 
     def refresh(self, uri=None):
-        pass  # TODO
+        self.search()
 
     def search(self, query=None, uris=None):
+        logger.info('subsonic search %s' % query)
         if not query:
             tracks = []
-            for letter in conn.getArtists().get('artists').get('index'):
+            for letter in self.backend.subsonic.getArtists().get('artists').get('index'):
                 for artist in letter.get('artist'):
                     if type(artist) is dict:
-                        for album in conn.getArtist(artist.get('id')).get('artist').get('album'):
+                        for album in self.backend.subsonic.getArtist(artist.get('id')).get('artist').get('album'):
                             if type(album) is dict:
-                                for song in conn.getAlbum(album.get('id')).get('album').get('song'):
+                                for song in self.backend.subsonic.getAlbum(album.get('id')).get('album').get('song'):
                                     if type(song) is dict:
-                                        tracks.append(Track(uri="%s:%d/%s/%s?id=%s&u=%s&p=%s&c=mopidy&v=1.8" % (self.subsonic._baseUrl, self.subsonic._port, self.subsonic._serverPath, 'download.view', song.get('id'), self.subsonic._username, self.subsonic._rawPass), name=song.get('title'), artist=artist.get('name')))
+                                        tracks.append(Track(uri="%s:%d/%s/%s?id=%s&u=%s&p=%s&c=mopidy&v=1.8" % (self.backend.subsonic._baseUrl, self.backend.subsonic._port, self.backend.subsonic._serverPath, 'download.view', song.get('id'), self.backend.subsonic._username, self.backend.subsonic._rawPass), name=song.get('title'), artists={Artist(name=song.get('artist'))}, album=song.get('album'), track_no=song.get('track'), disc_no=None, date=song.get('year'), length=song.get('duration'), bitrate=song.get('bitRate')))
             return tracks
         else:
             return []

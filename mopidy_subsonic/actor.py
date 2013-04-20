@@ -9,9 +9,9 @@
 # Author: Kevin Lemonnier
 #           By: Kevin Lemonnier
 # Created: Sat Apr 20 17:58:23 2013 (+0200)
-# Last-Updated: Sat Apr 20 20:19:43 2013 (+0200)
+# Last-Updated: Sat Apr 20 20:21:30 2013 (+0200)
 # Version:
-#     Update #: 13
+#     Update #: 15
 
 # Change Log:
 #
@@ -51,7 +51,7 @@ class SubsonicBackend(pykka.ThreadingActor, base.Backend):
         self.playback = None
         self.playlists = None
 
-        self.uri_schemes = None
+        self.uri_schemes = ['subsonic:']
 
         self.subsonic = libsonic.Connection(
             self.hostname,
