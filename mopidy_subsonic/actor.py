@@ -9,9 +9,9 @@
 # Author: Kevin Lemonnier
 #           By: Kevin Lemonnier
 # Created: Sat Apr 20 17:58:23 2013 (+0200)
-# Last-Updated: Sat Apr 20 18:09:57 2013 (+0200)
+# Last-Updated: Sat Apr 20 20:19:43 2013 (+0200)
 # Version:
-#     Update #: 5
+#     Update #: 13
 
 # Change Log:
 #
@@ -37,12 +37,12 @@ class SubsonicBackend(pykka.ThreadingActor, base.Backend):
     def __init__(self, config, audio):
         super(SubsonicBackend, self).__init__()
 
-        self.config = config
-        self.hostname = config.get("hostname")
-        self.port = config.get("port")
-        self.username = config.get("username")
-        self.password = config.get("password")
-        if (config.get("ssl") == "yes"):
+        self.config = config['subsonic']
+        self.hostname = self.config.get("hostname")
+        self.port = self.config.get("port")
+        self.username = self.config.get("username")
+        self.password = self.config.get("password")
+        if (self.config.get("ssl") == "yes"):
             self.hostname = 'https://' + self.hostname
         else:
             self.hostname = 'http://' + self.hostname
@@ -59,7 +59,7 @@ class SubsonicBackend(pykka.ThreadingActor, base.Backend):
             self.password,
             self.port
         )
-        logger.info('Subsonic using %s:%d as server', hostname, port)
+        logger.info('Subsonic using %s:%d as server', self.hostname, self.port)
 
     def on_start(self):
         pass
