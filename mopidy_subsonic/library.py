@@ -9,9 +9,9 @@
 # Author: Kevin Lemonnier
 #           By: Kevin Lemonnier
 # Created: Wed Apr 17 19:54:44 2013 (+0200)
-# Last-Updated: Sun Apr 21 16:10:38 2013 (+0200)
+# Last-Updated: Sun Apr 21 17:01:59 2013 (+0200)
 # Version:
-#     Update #: 141
+#     Update #: 150
 
 # Change Log:
 #
@@ -62,11 +62,15 @@ class SubsonicLibraryProvider(base.BaseLibraryProvider):
             for q in query:
                 res = self.backend.subsonic.search2("%s: %s" % (q, query[q][0]), artistCount=1000000000, albumCount=1000000000, songCount=1000000000).get('searchResult2')
                 if ('song' in res):
-                    for song in res.get('song'):
-                        if (song is dict):
+                    if (type(res.get('song')) == list):
+                        for song in res.get('song'):
                             artistlist = {Artist(uri="", name=song.get('artist'))}
                             oalbum = Album(uri="", name=song.get('album'))
                             tracks.append(Track(uri="%s:%d/%s/%s?id=%s&u=%s&p=%s&c=mopidy&v=1.8" % (self.backend.subsonic._baseUrl, self.backend.subsonic._port, self.backend.subsonic._serverPath, 'download.view', song.get('id'), self.backend.subsonic._username, self.backend.subsonic._rawPass), name=song.get('title'), artists=artistlist, album=oalbum, track_no=song.get('track'), disc_no=None, date=song.get('year'), length=song.get('duration'), bitrate=song.get('bitRate')))
+                    else:
+                        artistlist = {Artist(uri="", name=res.get('song').get('artist'))}
+                        oalbum = Album(uri="", name=res.get('song').get('album'))
+                        tracks.append(Track(uri="%s:%d/%s/%s?id=%s&u=%s&p=%s&c=mopidy&v=1.8" % (self.backend.subsonic._baseUrl, self.backend.subsonic._port, self.backend.subsonic._serverPath, 'download.view', res.get('song').get('id'), self.backend.subsonic._username, self.backend.subsonic._rawPass), name=res.get('song').get('title'), artists=artistlist, album=oalbum, track_no=res.get('song').get('track'), disc_no=None, date=res.get('song').get('year'), length=res.get('song').get('duration'), bitrate=res.get('song').get('bitRate')))
                 if ('album' in res):
                     if (type(res.get('album')) == list):
                         for alb in res.get('album'):
@@ -74,9 +78,11 @@ class SubsonicLibraryProvider(base.BaseLibraryProvider):
                     else:
                         albums.append(Album(uri="", name=res.get('album').get('album'), artists={Artist(uri="", name=res.get('album').get('artist'))}))
                 if ('artist' in res):
-                    for art in res.get('artist'):
-                        if (art is dict):
+                    if (type(res.get('artist')) == list):
+                        for art in res.get('artist'):
                             artists.append(Artist(uri="", name=art.get('name')))
+                    else:
+                        artists.append(Artist(uri="", name=res.get('artist').get('name')))
             return (SearchResult(uri=None, tracks=tracks, artists=artists, albums=albums))
 
 
