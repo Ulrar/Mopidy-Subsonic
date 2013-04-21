@@ -17,9 +17,12 @@ Before starting Mopidy, you must add your Subsonic username, password and hostna
 to the Mopidy configuration file::
 
     [subsonic]
+    enabled = yes
     hostname = http://you.subsonic.com
     username = alice
     password = secret
+    ssl = yes
+    port = 443
 
 Project resources
 -----------------
