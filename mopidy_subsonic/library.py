@@ -9,9 +9,9 @@
 # Author: Kevin Lemonnier
 #           By: Kevin Lemonnier
 # Created: Wed Apr 17 19:54:44 2013 (+0200)
-# Last-Updated: Sun Apr 21 18:36:49 2013 (+0200)
+# Last-Updated: Sun Apr 21 20:45:27 2013 (+0200)
 # Version:
-#     Update #: 205
+#     Update #: 219
 
 # Change Log:
 #
@@ -43,19 +43,34 @@ class SubsonicLibraryProvider(base.BaseLibraryProvider):
         return self.search(query=query, uris=uris)
 
     def lookup(self, uri):
-        if (uri == "/"):
-            logger.info('subsonic lookup of all tracks')
-            return (self.getAllTracks()[0])
+        logger.info('Subsonic: lookup of uri %s' % uri)
+        if (uri.startswhith("subsonic:")):
+            if (uri.find("artist") != -1):
+                artist = uri[uri.find("artist") + 6:]
+                res = self.search(dict(artist={artist}))
+                return res.tracks
+            elif (uri.find("album") != -1):
+                album = uri[uri.find("album") + 5:]
+                res = self.search(dict(album={album}))
+                return res.tracks
+            else:
+                return []
         else:
+            tracks = []
             tid = urlparse.parse_qs(urlparse.urlsplit(uri).query)[0]
-            logger.info('subsonic lookup of id %d' % tid)
+            track = self.backend.subsonic.getSong(tid).get('song')
+            artistlist = {Artist(uri="subsonic:artist=%s" % song.get('artist'), name=song.get('artist'))}
+            oalbum = Album(uri="subsonic:album=%s", name=song.get('album'), artists=artistlist)
+            tracks.append(Track(uri="%s:%d/%s/%s?id=%s&u=%s&p=%s&c=mopidy&v=1.8" % (self.backend.subsonic._baseUrl, self.backend.subsonic._port, self.backend.subsonic._serverPath, 'download.view', song.get('id'), self.backend.subsonic._username, self.backend.subsonic._rawPass), name=song.get('title'), artists=artistlist, album=oalbum, track_no=song.get('track'), disc_no=None, date=song.get('year'), length=song.get('duration'), bitrate=song.get('bitRate')))
+            return tracks
+
 
     def refresh(self, uri=None):
-        logger.info("subsonic: refreshing library")
+        logger.info("Subsonic: refreshing library")
         (self.ltracks, self.lartists, self.lalbums) = self.getAllTracks()
 
     def search(self, query=None, uris=None):
-        logger.info('subsonic search %s' % query)
+        logger.info('Subsonic: search %s' % query)
         if (self.ltracks == None or self.lartists == None or self.lalbums == None):
             self.refresh()
         if not query:
@@ -92,10 +107,10 @@ class SubsonicLibraryProvider(base.BaseLibraryProvider):
         albums = []
         res = self.backend.subsonic.search2("*:*", artistCount=0, albumCount=0, songCount=1000000000).get('searchResult2')
         for song in res.get('song'):
-            artistlist = {Artist(uri="", name=song.get('artist'))}
-            oalbum = Album(uri="", name=song.get('album'), artists=artistlist)
+            artistlist = {Artist(uri="subsonic:artist=%s" % song.get('artist'), name=song.get('artist'))}
+            oalbum = Album(uri="subsonic:album=%s", name=song.get('album'), artists=artistlist)
             tracks.append(Track(uri="%s:%d/%s/%s?id=%s&u=%s&p=%s&c=mopidy&v=1.8" % (self.backend.subsonic._baseUrl, self.backend.subsonic._port, self.backend.subsonic._serverPath, 'download.view', song.get('id'), self.backend.subsonic._username, self.backend.subsonic._rawPass), name=song.get('title'), artists=artistlist, album=oalbum, track_no=song.get('track'), disc_no=None, date=song.get('year'), length=song.get('duration'), bitrate=song.get('bitRate')))
-            artists.append(Artist(uri="", name=song.get('artist')))
+            artists.append(Artist(uri="subsonic:artist=%s" % song.get('artist'), name=song.get('artist')))
             albums.append(oalbum)
         return (tracks, artists, albums)
 
