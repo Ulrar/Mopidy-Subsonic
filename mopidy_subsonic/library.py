@@ -9,9 +9,9 @@
 # Author: Kevin Lemonnier
 #           By: Kevin Lemonnier
 # Created: Wed Apr 17 19:54:44 2013 (+0200)
-# Last-Updated: Sun Apr 21 21:51:13 2013 (+0200)
+# Last-Updated: Sun Apr 21 22:12:35 2013 (+0200)
 # Version:
-#     Update #: 243
+#     Update #: 244
 
 # Change Log:
 #
@@ -90,6 +90,10 @@ class SubsonicLibraryProvider(base.BaseLibraryProvider):
                         if (art.name == query["artist"][0]):
                             remove = False
                     if (remove == True):
+                        tracks.remove(track)
+                        continue
+                if ("date" in query):
+                    if not (track.date == query["date"][0]):
                         tracks.remove(track)
                         continue
                 if (track.album not in albums):
