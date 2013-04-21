@@ -9,9 +9,9 @@
 # Author: Kevin Lemonnier
 #           By: Kevin Lemonnier
 # Created: Wed Apr 17 19:54:44 2013 (+0200)
-# Last-Updated: Sun Apr 21 22:22:27 2013 (+0200)
+# Last-Updated: Sun Apr 21 22:55:37 2013 (+0200)
 # Version:
-#     Update #: 247
+#     Update #: 252
 
 # Change Log:
 #
@@ -61,7 +61,7 @@ class SubsonicLibraryProvider(base.BaseLibraryProvider):
             track = self.backend.subsonic.getSong(tid).get('song')
             artistlist = {Artist(uri="subsonic:artist=%s" % song.get('artist'), name=song.get('artist'))}
             oalbum = Album(uri="subsonic:album=%s", name=song.get('album'), artists=artistlist)
-            tracks.append(Track(uri="%s:%d/%s/%s?id=%s&u=%s&p=%s&c=mopidy&v=1.8" % (self.backend.subsonic._baseUrl, self.backend.subsonic._port, self.backend.subsonic._serverPath, 'download.view', song.get('id'), self.backend.subsonic._username, self.backend.subsonic._rawPass), name=song.get('title'), artists=artistlist, album=oalbum, track_no=song.get('track'), disc_no=None, date=song.get('year'), length=song.get('duration'), bitrate=song.get('bitRate')))
+            tracks.append(Track(uri="%s:%d/%s/%s?id=%s&u=%s&p=%s&c=mopidy&v=1.8" % (self.backend.subsonic._baseUrl, self.backend.subsonic._port, self.backend.subsonic._serverPath, 'stream.view', song.get('id'), self.backend.subsonic._username, self.backend.subsonic._rawPass), name=song.get('title'), artists=artistlist, album=oalbum, track_no=song.get('track'), disc_no=None, date=song.get('year'), length=song.get('duration'), bitrate=song.get('bitRate')))
             return tracks
 
 
@@ -70,7 +70,6 @@ class SubsonicLibraryProvider(base.BaseLibraryProvider):
         (self.ltracks, self.lartists, self.lalbums) = self.getAllTracks()
 
     def search(self, query=None, uris=None):
-        logger.info('Subsonic: search %s' % query)
         if (self.ltracks == None or self.lartists == None or self.lalbums == None):
             self.refresh()
         if not query:
@@ -92,10 +91,10 @@ class SubsonicLibraryProvider(base.BaseLibraryProvider):
                     if (remove == True):
                         tracks.remove(track)
                         continue
-                if ("date" in query):
-                    if not (track.date == query["date"][0]):
-                        tracks.remove(track)
-                        continue
+#                if ("date" in query):
+#                    if not (track.date == query["date"][0]):
+#                        tracks.remove(track)
+#                        continue
                 if (track.album not in albums):
                     albums.append(track.album)
                 for artist in track.artists:
@@ -111,7 +110,7 @@ class SubsonicLibraryProvider(base.BaseLibraryProvider):
         res = self.backend.subsonic.search2("*:*", artistCount=0, albumCount=0, songCount=1000000000).get('searchResult2')
         for song in res.get('song'):
             artistlist = {Artist(uri="subsonic:artist=%s" % song.get('artist'), name=song.get('artist'))}
-            oalbum = Album(uri="subsonic:album=%s", name=song.get('album'), artists=artistlist)
+            oalbum = Album(uri="subsonic:album=%s" % song.get('album'), name=song.get('album'), artists=artistlist)
             tracks.append(Track(uri="%s:%d/%s/%s?id=%s&u=%s&p=%s&c=mopidy&v=1.8" % (self.backend.subsonic._baseUrl, self.backend.subsonic._port, self.backend.subsonic._serverPath, 'download.view', song.get('id'), self.backend.subsonic._username, self.backend.subsonic._rawPass), name=song.get('title'), artists=artistlist, album=oalbum, track_no=song.get('track'), disc_no=None, date=song.get('year'), length=song.get('duration'), bitrate=song.get('bitRate')))
             artists.append(Artist(uri="subsonic:artist=%s" % song.get('artist'), name=song.get('artist')))
             albums.append(oalbum)

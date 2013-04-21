@@ -9,9 +9,9 @@
 # Author: Kevin Lemonnier
 #           By: Kevin Lemonnier
 # Created: Sat Apr 20 17:58:23 2013 (+0200)
-# Last-Updated: Sat Apr 20 20:21:30 2013 (+0200)
+# Last-Updated: Sun Apr 21 22:47:42 2013 (+0200)
 # Version:
-#     Update #: 15
+#     Update #: 18
 
 # Change Log:
 #
@@ -62,7 +62,7 @@ class SubsonicBackend(pykka.ThreadingActor, base.Backend):
         logger.info('Subsonic using %s:%d as server', self.hostname, self.port)
 
     def on_start(self):
-        pass
+        self.library.refresh()
 
     def on_stop(self):
         pass
