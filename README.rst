@@ -1,4 +1,4 @@
-Mopidy-Soundspot
+Mopidy-Subsonic
 ================
 
 `Mopidy <http://www.mopidy.com/>`_
