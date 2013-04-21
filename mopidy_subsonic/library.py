@@ -9,9 +9,9 @@
 # Author: Kevin Lemonnier
 #           By: Kevin Lemonnier
 # Created: Wed Apr 17 19:54:44 2013 (+0200)
-# Last-Updated: Sun Apr 21 17:01:59 2013 (+0200)
+# Last-Updated: Sun Apr 21 18:36:49 2013 (+0200)
 # Version:
-#     Update #: 150
+#     Update #: 205
 
 # Change Log:
 #
@@ -35,6 +35,9 @@ logger = logging.getLogger('mopidy.backends.subsonic')
 class SubsonicLibraryProvider(base.BaseLibraryProvider):
     def __init__(self, *args, **kwargs):
         super(SubsonicLibraryProvider, self).__init__(*args, **kwargs)
+        self.ltracks = None
+        self.lartists = None
+        self.lalbums = None
 
     def find_exact(self, query=None, uris=None):
         return self.search(query=query, uris=uris)
@@ -48,43 +51,39 @@ class SubsonicLibraryProvider(base.BaseLibraryProvider):
             logger.info('subsonic lookup of id %d' % tid)
 
     def refresh(self, uri=None):
-        self.search()
+        logger.info("subsonic: refreshing library")
+        (self.ltracks, self.lartists, self.lalbums) = self.getAllTracks()
 
     def search(self, query=None, uris=None):
         logger.info('subsonic search %s' % query)
+        if (self.ltracks == None or self.lartists == None or self.lalbums == None):
+            self.refresh()
         if not query:
-            (tracks, artists, albums) = self.getAllTracks()
-            return (SearchResult(uri=None, tracks=tracks, artists=artists, albums=albums))
+            return (SearchResult(uri=None, tracks=self.ltracks, artists=self.lartists, albums=self.lalbums))
         else:
-            tracks = []
+            tracks = self.ltracks
             artists = []
             albums = []
-            for q in query:
-                res = self.backend.subsonic.search2("%s: %s" % (q, query[q][0]), artistCount=1000000000, albumCount=1000000000, songCount=1000000000).get('searchResult2')
-                if ('song' in res):
-                    if (type(res.get('song')) == list):
-                        for song in res.get('song'):
-                            artistlist = {Artist(uri="", name=song.get('artist'))}
-                            oalbum = Album(uri="", name=song.get('album'))
-                            tracks.append(Track(uri="%s:%d/%s/%s?id=%s&u=%s&p=%s&c=mopidy&v=1.8" % (self.backend.subsonic._baseUrl, self.backend.subsonic._port, self.backend.subsonic._serverPath, 'download.view', song.get('id'), self.backend.subsonic._username, self.backend.subsonic._rawPass), name=song.get('title'), artists=artistlist, album=oalbum, track_no=song.get('track'), disc_no=None, date=song.get('year'), length=song.get('duration'), bitrate=song.get('bitRate')))
-                    else:
-                        artistlist = {Artist(uri="", name=res.get('song').get('artist'))}
-                        oalbum = Album(uri="", name=res.get('song').get('album'))
-                        tracks.append(Track(uri="%s:%d/%s/%s?id=%s&u=%s&p=%s&c=mopidy&v=1.8" % (self.backend.subsonic._baseUrl, self.backend.subsonic._port, self.backend.subsonic._serverPath, 'download.view', res.get('song').get('id'), self.backend.subsonic._username, self.backend.subsonic._rawPass), name=res.get('song').get('title'), artists=artistlist, album=oalbum, track_no=res.get('song').get('track'), disc_no=None, date=res.get('song').get('year'), length=res.get('song').get('duration'), bitrate=res.get('song').get('bitRate')))
-                if ('album' in res):
-                    if (type(res.get('album')) == list):
-                        for alb in res.get('album'):
-                            albums.append(Album(uri="", name=alb.get('album'), artists={Artist(uri="", name=alb.get('artist'))}))
-                    else:
-                        albums.append(Album(uri="", name=res.get('album').get('album'), artists={Artist(uri="", name=res.get('album').get('artist'))}))
-                if ('artist' in res):
-                    if (type(res.get('artist')) == list):
-                        for art in res.get('artist'):
-                            artists.append(Artist(uri="", name=art.get('name')))
-                    else:
-                        artists.append(Artist(uri="", name=res.get('artist').get('name')))
+            for track in tracks:
+                if ("album" in query):
+                    if not (track.album.name == query["album"][0]):
+                        tracks.remove(track)
+                        continue
+                if ("artist" in query):
+                    remove = True
+                    for art in track.artists:
+                        if (art.name == query["artist"][0]):
+                            remove = False
+                    if (remove == True):
+                        tracks.remove(track)
+                        continue
+                if (track.album not in albums):
+                    albums.append(track.album)
+                for artist in track.artists:
+                    if (artist not in artists):
+                        artists.append(artist)
+            print albums
             return (SearchResult(uri=None, tracks=tracks, artists=artists, albums=albums))
-
 
 
     def getAllTracks(self):
@@ -94,7 +93,7 @@ class SubsonicLibraryProvider(base.BaseLibraryProvider):
         res = self.backend.subsonic.search2("*:*", artistCount=0, albumCount=0, songCount=1000000000).get('searchResult2')
         for song in res.get('song'):
             artistlist = {Artist(uri="", name=song.get('artist'))}
-            oalbum = Album(uri="", name=song.get('album'))
+            oalbum = Album(uri="", name=song.get('album'), artists=artistlist)
             tracks.append(Track(uri="%s:%d/%s/%s?id=%s&u=%s&p=%s&c=mopidy&v=1.8" % (self.backend.subsonic._baseUrl, self.backend.subsonic._port, self.backend.subsonic._serverPath, 'download.view', song.get('id'), self.backend.subsonic._username, self.backend.subsonic._rawPass), name=song.get('title'), artists=artistlist, album=oalbum, track_no=song.get('track'), disc_no=None, date=song.get('year'), length=song.get('duration'), bitrate=song.get('bitRate')))
             artists.append(Artist(uri="", name=song.get('artist')))
             albums.append(oalbum)
