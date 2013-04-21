@@ -9,9 +9,9 @@
 # Author: Kevin Lemonnier
 #           By: Kevin Lemonnier
 # Created: Wed Apr 17 19:54:44 2013 (+0200)
-# Last-Updated: Sun Apr 21 22:12:35 2013 (+0200)
+# Last-Updated: Sun Apr 21 22:22:27 2013 (+0200)
 # Version:
-#     Update #: 244
+#     Update #: 247
 
 # Change Log:
 #
@@ -74,9 +74,9 @@ class SubsonicLibraryProvider(base.BaseLibraryProvider):
         if (self.ltracks == None or self.lartists == None or self.lalbums == None):
             self.refresh()
         if not query:
-            return (SearchResult(uri=None, tracks=self.ltracks, artists=self.lartists, albums=self.lalbums))
+            return (SearchResult(uri=None, tracks=self.ltracks[:], artists=self.lartists[:], albums=self.lalbums[:]))
         else:
-            tracks = self.ltracks
+            tracks = self.ltracks[:]
             artists = []
             albums = []
             for track in tracks[:]:
