@@ -9,9 +9,9 @@
 # Author: Kevin Lemonnier
 #           By: Kevin Lemonnier
 # Created: Wed Apr 17 19:54:44 2013 (+0200)
-# Last-Updated: Sun Apr 21 16:00:29 2013 (+0200)
+# Last-Updated: Sun Apr 21 16:10:38 2013 (+0200)
 # Version:
-#     Update #: 139
+#     Update #: 141
 
 # Change Log:
 #
@@ -85,7 +85,7 @@ class SubsonicLibraryProvider(base.BaseLibraryProvider):
         tracks = []
         artists = []
         albums = []
-        res = self.backend.subsonic.search2("a* OR b* OR c* OR d* OR e* OR f* OR g* OR h* OR i* OR j* OR k* OR l* OR m* OR n* OR o* OR p* OR q* OR r* OR s* OR t* OR u* OR v* OR w* OR x* OR y* OR z* OR A* OR B* OR C* OR D* OR E* OR F* OR G* OR H* OR I* OR J* OR K* OR L* OR M* OR N* OR O* OR P* OR Q* OR R* OR S* OR T* OR U* OR V* OR W* OR X* OR Y* OR Z* OR 0* OR 1* OR 2* OR 3* OR 4* OR 5* OR 6* OR 7* OR 8* OR 9*", artistCount=0, albumCount=0, songCount=1000000000).get('searchResult2')
+        res = self.backend.subsonic.search2("*:*", artistCount=0, albumCount=0, songCount=1000000000).get('searchResult2')
         for song in res.get('song'):
             artistlist = {Artist(uri="", name=song.get('artist'))}
             oalbum = Album(uri="", name=song.get('album'))
