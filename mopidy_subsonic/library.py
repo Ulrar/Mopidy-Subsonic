@@ -9,9 +9,9 @@
 # Author: Kevin Lemonnier
 #           By: Kevin Lemonnier
 # Created: Wed Apr 17 19:54:44 2013 (+0200)
-# Last-Updated: Sun Apr 21 20:45:27 2013 (+0200)
+# Last-Updated: Sun Apr 21 21:51:13 2013 (+0200)
 # Version:
-#     Update #: 219
+#     Update #: 243
 
 # Change Log:
 #
@@ -79,7 +79,7 @@ class SubsonicLibraryProvider(base.BaseLibraryProvider):
             tracks = self.ltracks
             artists = []
             albums = []
-            for track in tracks:
+            for track in tracks[:]:
                 if ("album" in query):
                     if not (track.album.name == query["album"][0]):
                         tracks.remove(track)
@@ -97,9 +97,8 @@ class SubsonicLibraryProvider(base.BaseLibraryProvider):
                 for artist in track.artists:
                     if (artist not in artists):
                         artists.append(artist)
-            print albums
-            return (SearchResult(uri=None, tracks=tracks, artists=artists, albums=albums))
-
+            res = SearchResult(uri=None, tracks=tracks, artists=artists, albums=albums)
+            return (res)
 
     def getAllTracks(self):
         tracks = []
