@@ -9,9 +9,9 @@
 # Author: Kevin Lemonnier
 #           By: Kevin Lemonnier
 # Created: Sat Apr 20 17:58:23 2013 (+0200)
-# Last-Updated: Sat May  4 18:28:24 2013 (+0200)
+# Last-Updated: Sat May  4 20:24:15 2013 (+0200)
 # Version:
-#     Update #: 29
+#     Update #: 30
 
 # Change Log:
 #
@@ -70,7 +70,6 @@ class SubsonicBackend(pykka.ThreadingActor, base.Backend):
 
 class SubsonicPlaybackProvider(base.BasePlaybackProvider):
     def play(self, track):
-        logger.info('Getting info for track %s with name %s' % (track.uri, track.name))
         ntrack = Track(uri=track.uri[11:], name=track.name, artists=track.artists, album=track.album, track_no=track.track_no, disc_no=track.disc_no, date=track.date, length=track.length, bitrate=track.bitrate, musicbrainz_id=track.musicbrainz_id)
         return super(SubsonicPlaybackProvider, self).play(ntrack)
 

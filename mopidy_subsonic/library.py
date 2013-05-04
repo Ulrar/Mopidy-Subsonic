@@ -9,9 +9,9 @@
 # Author: Kevin Lemonnier
 #           By: Kevin Lemonnier
 # Created: Wed Apr 17 19:54:44 2013 (+0200)
-# Last-Updated: Sat May  4 18:21:28 2013 (+0200)
+# Last-Updated: Sat May  4 20:31:12 2013 (+0200)
 # Version:
-#     Update #: 334
+#     Update #: 336
 
 # Change Log:
 #
@@ -41,7 +41,6 @@ class SubsonicLibraryProvider(base.BaseLibraryProvider):
         return self.search(query=query, uris=uris)
 
     def lookup(self, uri):
-        logger.info('Subsonic: lookup of uri %s' % uri)
         if (uri.startswith("subsonic://")):
             if (uri.find("artist") != -1):
                 artist = uri[uri.find("artist") + 7:]
@@ -57,7 +56,7 @@ class SubsonicLibraryProvider(base.BaseLibraryProvider):
                 song = self.backend.subsonic.getSong(tid).get('song')
                 artistlist = {Artist(uri="subsonic://artist=%s" % song.get('artist'), name=song.get('artist'))}
                 oalbum = Album(uri="subsonic://album=%s", name=song.get('album'), artists=artistlist)
-                tracks.append(Track(uri="%s:%d/%s/%s?id=%s&u=%s&p=%s&c=mopidy&v=1.8" % (self.backend.subsonic._baseUrl, self.backend.subsonic._port, self.backend.subsonic._serverPath, 'stream.view', song.get('id'), self.backend.subsonic._username, self.backend.subsonic._rawPass), name=song.get('title'), artists=artistlist, album=oalbum, track_no=song.get('track'), disc_no=None, date=song.get('year'), length=song.get('duration'), bitrate=song.get('bitRate')))
+                tracks.append(Track(uri="%s:%d/%s/%s?id=%s&u=%s&p=%s&c=mopidy&v=1.8" % (self.backend.subsonic._baseUrl, self.backend.subsonic._port, self.backend.subsonic._serverPath, 'stream.view', song.get('id'), self.backend.subsonic._username, self.backend.subsonic._rawPass), name=song.get('title'), artists=artistlist, album=oalbum, track_no=song.get('track'), disc_no=None, date=song.get('year'), length=int(song.get('duration')) * 1000, bitrate=song.get('bitRate')))
                 return tracks
         return []
 
