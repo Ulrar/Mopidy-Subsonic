@@ -9,9 +9,9 @@
 # Author: Kevin Lemonnier
 #           By: Kevin Lemonnier
 # Created: Wed Apr 17 19:54:44 2013 (+0200)
-# Last-Updated: Sat May  4 17:15:28 2013 (+0200)
+# Last-Updated: Sat May  4 17:22:51 2013 (+0200)
 # Version:
-#     Update #: 319
+#     Update #: 324
 
 # Change Log:
 #
@@ -94,15 +94,17 @@ class SubsonicLibraryProvider(base.BaseLibraryProvider):
             artists = []
             albums = []
             if ("album" in query and "artist" in "query"):
-                artists.append(Artist(uri="subsonic://artist=%s" % query["artist"][0], name=query["artist"][0]))
-                albums.append(Album(uri="subsonic://album=%s" % query["album"][0], name=query["album"][0], artists=artists))
-                tracks = self.library[query["artist"][0]][query["album"][0]]
+                if (query["artist"][0] in self.library and query["album"][0]  in self.library[query["artist"][0]]):
+                    artists.append(Artist(uri="subsonic://artist=%s" % query["artist"][0], name=query["artist"][0]))
+                    albums.append(Album(uri="subsonic://album=%s" % query["album"][0], name=query["album"][0], artists=artists))
+                    tracks = self.library[query["artist"][0]][query["album"][0]]
             elif ("artist" in query):
-                artists.append(Artist(uri="subsonic://artist=%s" % query["artist"][0], name=query["artist"][0]))
-                for album in self.library[query["artist"][0]]:
-                    albums.append(Album(uri="subsonic://album=%s" % album, name=album, artists=artists))
-                    for song in self.library[query["artist"][0]][album]:
-                        tracks.append(song)
+                if (query["artist"][0] in self.library):
+                    artists.append(Artist(uri="subsonic://artist=%s" % query["artist"][0], name=query["artist"][0]))
+                    for album in self.library[query["artist"][0]]:
+                        albums.append(Album(uri="subsonic://album=%s" % album, name=album, artists=artists))
+                        for song in self.library[query["artist"][0]][album]:
+                            tracks.append(song)
             elif ("album" in query):
                 for artist in self.library:
                     if (query["album"][0] in artist):
