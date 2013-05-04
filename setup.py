@@ -9,9 +9,9 @@
 # Author: Kevin Lemonnier
 #           By: Kevin Lemonnier
 # Created: Sat Apr 20 15:45:58 2013 (+0200)
-# Last-Updated: Sun Apr 21 18:31:18 2013 (+0200)
+# Last-Updated: Sat May  4 18:31:17 2013 (+0200)
 # Version:
-#     Update #: 15
+#     Update #: 16
 
 # Change Log:
 #
@@ -24,7 +24,6 @@ from __future__ import unicode_literals
 
 import re
 from setuptools import setup, find_packages
-
 
 def get_version(filename):
     content = open(filename).read()
