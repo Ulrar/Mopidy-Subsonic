@@ -9,9 +9,9 @@
 # Author: Kevin Lemonnier
 #           By: Kevin Lemonnier
 # Created: Wed Apr 17 19:54:44 2013 (+0200)
-# Last-Updated: Sat May  4 17:22:51 2013 (+0200)
+# Last-Updated: Sat May  4 18:21:28 2013 (+0200)
 # Version:
-#     Update #: 324
+#     Update #: 334
 
 # Change Log:
 #
@@ -44,12 +44,12 @@ class SubsonicLibraryProvider(base.BaseLibraryProvider):
         logger.info('Subsonic: lookup of uri %s' % uri)
         if (uri.startswith("subsonic://")):
             if (uri.find("artist") != -1):
-                artist = uri[uri.find("artist") + 6:]
-                res = self.search(dict(artist={artist}))
+                artist = uri[uri.find("artist") + 7:]
+                res = self.search(dict(artist=[artist]))
                 return res.tracks
             elif (uri.find("album") != -1):
-                album = uri[uri.find("album") + 5:]
-                res = self.search(dict(album={album}))
+                album = uri[uri.find("album") + 6:]
+                res = self.search(dict(album=[album]))
                 return res.tracks
             else:
                 tracks = []
@@ -107,9 +107,9 @@ class SubsonicLibraryProvider(base.BaseLibraryProvider):
                             tracks.append(song)
             elif ("album" in query):
                 for artist in self.library:
-                    if (query["album"][0] in artist):
+                    if (query["album"][0] in self.library[artist]):
                         artists.append(artists.append(Artist(uri="subsonic://artist=%s" % artist, name=artist)))
-                        for song in library[artist][query["album"][0]]:
+                        for song in self.library[artist][query["album"][0]]:
                             tracks.append(song)
                 albums.append(Album(uri="subsonic://album=%s" % query["album"][0], name=query["album"][0], artists=artists))
             res = SearchResult(uri=None, tracks=tracks, artists=artists, albums=albums)

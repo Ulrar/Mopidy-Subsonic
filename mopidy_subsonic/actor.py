@@ -9,9 +9,9 @@
 # Author: Kevin Lemonnier
 #           By: Kevin Lemonnier
 # Created: Sat Apr 20 17:58:23 2013 (+0200)
-# Last-Updated: Sat May  4 16:16:03 2013 (+0200)
+# Last-Updated: Sat May  4 18:28:24 2013 (+0200)
 # Version:
-#     Update #: 24
+#     Update #: 29
 
 # Change Log:
 #
@@ -28,6 +28,7 @@ import libsonic
 
 from mopidy.backends import base
 from .library import SubsonicLibraryProvider
+from mopidy.models import Track
 
 logger = logging.getLogger('mopidy.backends.subsonic')
 
@@ -70,8 +71,8 @@ class SubsonicBackend(pykka.ThreadingActor, base.Backend):
 class SubsonicPlaybackProvider(base.BasePlaybackProvider):
     def play(self, track):
         logger.info('Getting info for track %s with name %s' % (track.uri, track.name))
-        track.uri = track.uri[11:]
-        return super(SubsonicPlaybackProvider, self).play(track)
+        ntrack = Track(uri=track.uri[11:], name=track.name, artists=track.artists, album=track.album, track_no=track.track_no, disc_no=track.disc_no, date=track.date, length=track.length, bitrate=track.bitrate, musicbrainz_id=track.musicbrainz_id)
+        return super(SubsonicPlaybackProvider, self).play(ntrack)
 
 #
 
