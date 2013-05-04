@@ -9,9 +9,9 @@
 # Author: Kevin Lemonnier
 #           By: Kevin Lemonnier
 # Created: Sat Apr 20 17:58:23 2013 (+0200)
-# Last-Updated: Sun Apr 21 22:47:42 2013 (+0200)
+# Last-Updated: Sat May  4 16:16:03 2013 (+0200)
 # Version:
-#     Update #: 18
+#     Update #: 24
 
 # Change Log:
 #
@@ -48,10 +48,10 @@ class SubsonicBackend(pykka.ThreadingActor, base.Backend):
             self.hostname = 'http://' + self.hostname
 
         self.library = SubsonicLibraryProvider(backend=self)
-        self.playback = None
+        self.playback = SubsonicPlaybackProvider(backend=self, audio=audio)
         self.playlists = None
 
-        self.uri_schemes = ['subsonic:']
+        self.uri_schemes = ['subsonic']
 
         self.subsonic = libsonic.Connection(
             self.hostname,
@@ -66,6 +66,12 @@ class SubsonicBackend(pykka.ThreadingActor, base.Backend):
 
     def on_stop(self):
         pass
+
+class SubsonicPlaybackProvider(base.BasePlaybackProvider):
+    def play(self, track):
+        logger.info('Getting info for track %s with name %s' % (track.uri, track.name))
+        track.uri = track.uri[11:]
+        return super(SubsonicPlaybackProvider, self).play(track)
 
 #
 
