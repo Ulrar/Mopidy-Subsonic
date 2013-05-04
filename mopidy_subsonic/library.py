@@ -9,9 +9,9 @@
 # Author: Kevin Lemonnier
 #           By: Kevin Lemonnier
 # Created: Wed Apr 17 19:54:44 2013 (+0200)
-# Last-Updated: Sat May  4 16:34:21 2013 (+0200)
+# Last-Updated: Sat May  4 16:40:17 2013 (+0200)
 # Version:
-#     Update #: 275
+#     Update #: 276
 
 # Change Log:
 #
@@ -110,7 +110,7 @@ class SubsonicLibraryProvider(base.BaseLibraryProvider):
         for song in res.get('song'):
             artistlist = {Artist(uri="subsonic://artist=%s" % song.get('artist'), name=song.get('artist'))}
             oalbum = Album(uri="subsonic://album=%s" % song.get('album'), name=song.get('album'), artists=artistlist)
-            tracks.append(Track(uri="subsonic://%s:%d/%s/%s?id=%s&u=%s&p=%s&c=mopidy&v=1.8" % (self.backend.subsonic._baseUrl, self.backend.subsonic._port, self.backend.subsonic._serverPath, 'download.view', song.get('id'), self.backend.subsonic._username, self.backend.subsonic._rawPass), name=song.get('title'), artists=artistlist, album=oalbum, track_no=song.get('track'), disc_no=None, date=song.get('year'), length=song.get('duration'), bitrate=song.get('bitRate')))
+            tracks.append(Track(uri="subsonic://%s:%d/%s/%s?id=%s&u=%s&p=enc:%s&c=mopidy&v=1.8" % (self.backend.subsonic._baseUrl, self.backend.subsonic._port, self.backend.subsonic._serverPath, 'download.view', song.get('id'), self.backend.subsonic._username, self.backend.subsonic._rawPass.encode("hex")), name=song.get('title'), artists=artistlist, album=oalbum, track_no=song.get('track'), disc_no=None, date=song.get('year'), length=song.get('duration'), bitrate=song.get('bitRate')))
             artists.append(Artist(uri="subsonic://artist=%s" % song.get('artist'), name=song.get('artist')))
             albums.append(oalbum)
         return (tracks, artists, albums)
