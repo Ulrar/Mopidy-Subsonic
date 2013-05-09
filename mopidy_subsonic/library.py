@@ -9,9 +9,9 @@
 # Author: Kevin Lemonnier
 #           By: Kevin Lemonnier
 # Created: Wed Apr 17 19:54:44 2013 (+0200)
-# Last-Updated: Sat May  4 20:31:12 2013 (+0200)
+# Last-Updated: Thu May  9 14:36:49 2013 (+0200)
 # Version:
-#     Update #: 336
+#     Update #: 340
 
 # Change Log:
 #
@@ -92,7 +92,7 @@ class SubsonicLibraryProvider(base.BaseLibraryProvider):
             tracks = []
             artists = []
             albums = []
-            if ("album" in query and "artist" in "query"):
+            if ("album" in query and "artist" in query):
                 if (query["artist"][0] in self.library and query["album"][0]  in self.library[query["artist"][0]]):
                     artists.append(Artist(uri="subsonic://artist=%s" % query["artist"][0], name=query["artist"][0]))
                     albums.append(Album(uri="subsonic://album=%s" % query["album"][0], name=query["album"][0], artists=artists))
